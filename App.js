@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState} from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, TouchableHighlight, ScrollView, Modal, Alert } from 'react-native';
 
 export default function App() {
 
@@ -9,6 +9,9 @@ export default function App() {
 
   const[getSavedAmount, setSavedAmount] = useState("");
   const[getDiscountedAmount, setDiscountedAmount] = useState("");
+
+  const[getHistory, setHistory] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const Disc = (val)=>{
     if(Number(val)<0 || Number(val)>100){
@@ -27,11 +30,50 @@ export default function App() {
     setSavedAmount(String(saveResult));
   }
 
-  const history = ()=>{
-
+  const histRecord = ()=>{
+    var histArray = getHistory;
+    var newArray = [];
+    newArray.push(getAmount);
+    newArray.push(getDiscount);
+    newArray.push(getDiscountedAmount);
+    newArray.push(getSavedAmount);
+    histArray.push(newArray);
+    setHistory(histArray);
   }
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+          <Text style={styles.modalText}>Calculation History</Text>
+          <ScrollView>
+                {getHistory.map(
+                    (val) => <Text key={Math.random()} style={{color:"#FFFFFF"}}>
+                                    Origional Price:{val[0]} {"\n"}
+                                    Discount %: {val[1]} {"\n"}
+                                    Dscounted Amount: {val[2]} {"\n"}
+                                    Saving: {val[3]} {"\n"} 
+                              </Text>
+                )}
+            </ScrollView>
+            <TouchableHighlight
+              style={{ ...styles.openButton, backgroundColor: "#F25278" }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableHighlight>
+          </View>
+        </View>
+      </Modal>
       <Text style={styles.title}>"DISCOUNT CALCULATOR"</Text>
       <View style={styles.InputContainer}>
 
@@ -39,6 +81,7 @@ export default function App() {
           <Text style={styles.InputHeading}>Original Amount</Text>
           <TextInput
             style={styles.TextInput}
+            keyboardType = "number-pad"
             value={getAmount}
             onChangeText={(val) => setAmount((val))}
             placeholder= "Enter Original Amount"
@@ -49,6 +92,7 @@ export default function App() {
           <Text style={styles.InputHeading}>Discount %</Text>
           <TextInput
             style={styles.TextInput}
+            keyboardType = "number-pad"
             value={getDiscount}
             onChangeText={(val) => Disc(val)}
             placeholder= "Enter Discount %"
@@ -86,7 +130,15 @@ export default function App() {
       <View style={styles.btnView}>
         <TouchableOpacity
         style={styles.btn}
-        onPress={() => history()}
+        onPress={() => histRecord()}
+        >
+          <Text style={styles.btnText}>Save Calculations</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.btnView}>
+        <TouchableOpacity
+        style={styles.btn}
+        onPress={() => {setModalVisible(!modalVisible)}}
         >
           <Text style={styles.btnText}>View History</Text>
         </TouchableOpacity>
@@ -150,5 +202,42 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     padding: 5,
     textAlign: "center"
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "black",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: "#000000",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#FFFFFF"
   }
 });
