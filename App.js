@@ -16,16 +16,12 @@ function StartScreen({navigation, route}){
 
   const [getList, setList] = useState([]);
 
-  useEffect(() => {
-    // When returning from History Screen Update state
-    //console.log(route.params.returnList);
-    if (route.params?.returnList) {
-      setList(route.params.returnList);
-      route.params = {};
-      // Reset Parameters
-      //navigation.setParams({ returnList: undefined });
-    }
-  });
+  // React.useEffect(() => {
+  //   if (route.params?.returnList) {
+  //     setList(route.params.returnList);
+  //     route.params = {};
+  //   }
+  //   }, [route.params?.returnList]);
 
 const Disc = (val)=>{
   if(Number(val)<0 || Number(val)>100){
@@ -151,13 +147,11 @@ function HistoryScreen ({navigation, route}){
 
   var newArray = route.params.newHistory;
   const[getHistory, setHistory] = useState(newArray);
-  var editedList = [];
   
 
   const removeHistoryItem = (itemKey) =>{
     console.log(itemKey);
     setHistory(List =>getHistory.filter(item => item.key != itemKey));
-    editedList = setHistory;
   }
 
   React.useLayoutEffect(() => {
@@ -169,7 +163,7 @@ function HistoryScreen ({navigation, route}){
           size={32}
           color="black"
           onPress={() =>
-            navigation.navigate('Home', {returnList: editedList})
+            navigation.navigate('Home', {returnList: setHistory})
           }
         />
       </View>
