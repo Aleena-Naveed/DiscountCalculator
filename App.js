@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useLayoutEffect, useEffect} from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, TouchableHighlight, ScrollView, Modal, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput,Button, TouchableOpacity, TouchableHighlight, ScrollView, Modal, Alert } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AntDesign } from '@expo/vector-icons';
@@ -15,7 +15,17 @@ function StartScreen({navigation, route}){
   const[getDiscountedAmount, setDiscountedAmount] = useState("");
 
   const [getList, setList] = useState([]);
-
+useEffect(() => {
+    // When returning from History Screen Update state
+    if (route.params?.returnList) {
+      setList(route.params.returnList);
+      //route.params.returnList.map((item) => console.log(item.data[0]) );
+      console.log("I am from useffect")
+      route.params.returnList.map((item) => console.log(item.data[0]) )
+      // Reste Parameters
+      navigation.setParams({ returnList: undefined });
+    }
+  });
   // React.useEffect(() => {
   //   if (route.params?.returnList) {
   //     setList(route.params.returnList);
@@ -146,30 +156,32 @@ navigation.setOptions({
 function HistoryScreen ({navigation, route}){
 
   var newArray = route.params.newHistory;
-  const[getHistory, setHistory] = useState(newArray);
-  
+  const[getHistory, setHistory] = useState(route.params.newHistory);
 
-  const removeHistoryItem = (itemKey) =>{
-    console.log(itemKey);
-    setHistory(List =>getHistory.filter(item => item.key != itemKey));
-  }
+ const removeHistoryItem = (a) => {
+    const list1 = getHistory.filter((item) => item.key != a);
+    setHistory(list1);
+    console.log("I am from list1")
+    list1.map((item) => console.log(item.data[0]) );
 
-  React.useLayoutEffect(() => {
+  };
+  // const removeHistoryItem = (itemKey) =>{
+  //   console.log(itemKey);
+  //   setHistory(List =>getHistory.filter(item => item.key != itemKey));
+  // }
+
+
     navigation.setOptions({
-      headerLeft: () => (
-        <View style={{ paddingLeft: 10 }}>
-        <AntDesign
-          name="back"
-          size={32}
-          color="black"
-          onPress={() =>
-            navigation.navigate('Home', {returnList: setHistory})
-          }
-        />
-      </View>
+    headerLeft: () => (
+        <Button
+          title="Back"
+          size={24}
+          color="purple"
+          onPress={()=> navigation.navigate("Home",{returnList: getHistory})}
+        ></Button>
     ),
     });
-  }, [navigation]);
+ 
 
    return(
    <View style={styles.container}> 
@@ -302,4 +314,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
- 
